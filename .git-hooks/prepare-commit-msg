@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Extract original commit message
+original_message=`cat "$1"`
+echo original_message
+echo $original_message
+# Extract JIRA task from branch
+branch=$(git branch | grep '*' | sed 's/* //')
+echo branch
+echo $branch
+jira_task=$(echo $branch | grep -Po 'ALL4CURE-[0-9]{3,}' | head -1)
+echo jira_task
+echo $jira_task
+jira_task_in_messsage=$(echo $original_message | grep -Po '^\[ALL4CURE-[0-9]{3,}\]' | head -1)
+echo jira_task_in_messsage
+echo $jira_task_in_messsage
+
+# If this branch is of the form [ALL4CURE-###] prepend the JIRA task to the commit message
+if [ ! -z "$jira_task" ] && [ -z "$jira_task_in_messsage" ]
+then
+	echo "[$jira_task] $original_message" > "$1"
+fi
